@@ -22,20 +22,20 @@ const fetchAllProducts = async (req, res) => {
         }
 
         // Counting total documents
-        const totalDocs = await Products.countDocuments(query);
+        const totalItems = await Products.countDocuments(query);
 
         // Pagination
         let page = parseInt(req.query._page) || 1;
         let limit = parseInt(req.query._limit) || 10;
         let skip = (page - 1) * limit;
-
-        const docs = await Products.find(query)
+        
+        const data = await Products.find(query)
                                     .sort(sort)
                                     .skip(skip)
                                     .limit(limit)
                                     .exec();
 
-        res.status(200).json({ data, items: totalDocs });
+        res.status(200).json({data, totalItems});
     } catch (err) {
         console.log("error", err);
         res.status(400).json(err);
@@ -45,6 +45,7 @@ const fetchAllProducts = async (req, res) => {
 const fetchProductById = async (req, res) => {
     const {id} = req.params;
     try{
+        console.log(id);
         const product = await Products.findById(req.params.id);
         res.status(200).json(product);
     }catch(err) {
