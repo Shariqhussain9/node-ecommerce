@@ -22,14 +22,16 @@ const fetchAllProducts = async (req, res) => {
         }
 
         // Counting total documents
-        const totalItems = await Products.countDocuments(query);
+        const totalItems = await Products.find({deleted: {$ne: true}})
+                                         .countDocuments(query);
 
         // Pagination
         let page = parseInt(req.query._page) || 1;
         let limit = parseInt(req.query._limit) || 10;
         let skip = (page - 1) * limit;
         
-        const data = await Products.find(query)
+        const data = await Products.find({deleted: {$ne: true}})
+                                    .find(query)
                                     .sort(sort)
                                     .skip(skip)
                                     .limit(limit)
