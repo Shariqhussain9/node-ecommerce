@@ -12,9 +12,9 @@ const addToCart = async (req, res)=> {
 }
 
 const fetchCartByUser = async (req, res)=> {
-    const {user}= req.query;
+    const user = req.user;
     try{
-        const cartItems = await Carts.find({ user: user}, 'quantity product').populate('product').exec();
+        const cartItems = await Carts.find({ user: user.id}, 'quantity product').populate('product').exec();
         res.status(200).json(cartItems);
 
     }catch(err){
