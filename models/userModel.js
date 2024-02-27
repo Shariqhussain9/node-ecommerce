@@ -2,11 +2,12 @@ const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
     email : {type: String, required: true, unique: true},
-    password : {type: String, required: true},
+    password : {type: Buffer, required: true},
     role: {type: String, required: true, default: 'user'},
     addresses: {type: mongoose.Schema.Types.Mixed , default: []},
     name: {type: String},
-    orders: {type: mongoose.Schema.Types.Mixed }
+    orders: {type: mongoose.Schema.Types.Mixed },
+    salt: Buffer
     
 })
 

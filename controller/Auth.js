@@ -1,34 +1,54 @@
 const Users = require("../models/userModel")
+const crypto = require('crypto');
+const SECRET_KEY = 'SECRET_KEY';
+const jwt = require('jsonwebtoken');
+const { sanitizeUser } = require("../config/common");
 
 const createUser = async (req, res) => {
-    console.log(req.body);
     const user = new Users(req.body);
     try{
-        const doc = user.save();
-        res.status(201).json({id: doc.id, role: doc.role});
+        const salt = crypto.randomBytes(16);
+        crypto.pbkdf2(
+          req.body.password,
+          salt,
+          310000,
+          32,
+          'sha256',
+          async function (err, hashedPassword) {
+            const user = new Users({ ...req.body, password: hashedPassword, salt });
+            const doc = await user.save();
+    
+            req.login(sanitizeUser(doc), (err) => {  // this also calls serializer and adds to session
+              if (err) {
+                res.status(400).json(err);
+              } else {
+                const token = jwt.sign(sanitizeUser(doc), SECRET_KEY);
+                res.status(201).json(token);
+              }
+            });
+          }
+        );
     }catch(err){
         res.status(400).json(err);
     }
 }
 
-const loginUser = async (req, res) => {
-    const {email, password} = req.body;
-    console.log(req.body);
-    try {
-        const user = await Users.findOne({ email: email}).exec();
-        console.log(user);
-        if(!user){
-            console.log("No Such User");
-            res.status(401).json({error: 'no such user exist'});
-        }else if(user.password === password){
-            res.status(200).json({ id: user.id, role: user.role })
-        }else{
-            res.status(400).json({message: 'invalid credentials'});
-        }
-
-    }catch(err){
-        req.status(400).json(err);
-    }
+const logInUser = async (req, res) => {
+  try{
+    console.log(req.user);
+    res.json(req.user);
+  }catch(err){
+    res.json(err);
+  }
+    
 }
 
-module.exports = { createUser, loginUser}
+const checkUser = async (req, res) => {
+    try{
+        res.json({status:'success',user: req.user});
+    }catch(err){
+        res.status(400).json(err);
+    }
+  };
+
+module.exports = { createUser, logInUser, checkUser}

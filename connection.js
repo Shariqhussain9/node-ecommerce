@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
+
 const connect = () => {
     try{
-        mongoose.connect('mongodb+srv://admin:admin@nodejspractice.xhkjbbc.mongodb.net/ecommerce');
-        // mongoose.connect('mongodb+srv://admin:admin@nodejspractice.xhkjbbc.mongodb.net/?retryWrites=true&w=majority&appName=NodeJsPractice&collectionName=ecommerce')
-
+        mongoose.connect(process.env.MONGO_URL);
+        
     }
     catch(err) {
         console.log(("Error", err))

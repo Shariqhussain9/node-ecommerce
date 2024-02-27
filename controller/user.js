@@ -2,8 +2,6 @@ const Users = require("../models/userModel");
 
 exports.fetchUserById = async (req, res) => {
     const id = req.params.id;
-    console.log("id", id);
-
     try{
         const user = await Users.findById(id);
         res.status(200).json(user);
@@ -14,7 +12,6 @@ exports.fetchUserById = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     const {id} = req.params;
-    console.log(req.params, req.body);
     try{
         const user = await Users.findByIdAndUpdate(id, req.body, { new: true});
         res.status(200).json(user);

@@ -14,7 +14,7 @@ const addToCart = async (req, res)=> {
 const fetchCartByUser = async (req, res)=> {
     const {user}= req.query;
     try{
-        const cartItems = await Carts.find({ user: user}).populate('product');
+        const cartItems = await Carts.find({ user: user}, 'quantity product').populate('product').exec();
         res.status(200).json(cartItems);
 
     }catch(err){
@@ -24,10 +24,9 @@ const fetchCartByUser = async (req, res)=> {
 
 const updateCart = async (req, res)=> {
     const {id} = req.params;
-    console.log(req.params, req.body);
     try{
         const cart = await Carts.findByIdAndUpdate( id, req.body, {new: true} );
-        const result = cart.populate('product');
+        const result = await cart.populate('product');
         res.status(200).json(result);
 
     }catch(err){
